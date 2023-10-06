@@ -124,15 +124,33 @@ return -1;
 //i is what page we are looking at (I.E what number in what layer)
 //depth is how far we are down, max of 3.
 //list is the return of the flags and the physical location
-uint64 rec_page(i,depth,list){
+int rec_page(i,depth){
   uint64 j=i;
   while(j, j<512,j++ ){
-    if (j &&1){
+    if (j || 1111111111111110  == 11111111111111111){
       if (depth==3){
-        
+        //read
+         if (j || 1111111111111101  != 11111111111111111){
+          printf("!r");
+         }
+         //write
+         if (j || 1111111111111011  != 11111111111111111){
+          printf("!w");
+         }
+         //execute
+         if (j || 1111111111110111  != 11111111111111111){
+          printf("!x");
+         }
+         //user accesable
+         if (j || 1111111111101111  != 11111111111111111){
+          printf("!u");
+         }
+        return 0;
       }
-      rec_page(j,depth+1,list);
+      printf("j");
+      rec_page(j,depth+1);
     }
 
   }
+  return 0;
 }

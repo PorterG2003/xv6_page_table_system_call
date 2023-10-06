@@ -2,7 +2,7 @@
 Assignment for Operating Systems. Creates a system call to print out the page table.
 
 # Authors
-- Porter
+- Porter Gardiner
 - Dason
 - Liam
 - Gabe

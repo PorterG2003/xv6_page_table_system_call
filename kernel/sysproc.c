@@ -93,40 +93,47 @@ sys_uptime(void)
 int
 sys_pages(void)
 {
-//get the pid from arguments
+  //get the pid from arguments
   int pid;
-  struct cpu *c=mycpu();
+  //struct cpu *c=mycpu();
   argint(0, &pid);
 
   
 
-//with the pid, find p
-  int found = 0;
-  struct proc *my_p;
-  struct proc *proc;
+  //with the pid, find p
+  struct proc *my_p = 0;
+  struct proc proc[NPROC];
   struct proc *p;
   uint64 pt[NPROC];
 
   for( p = proc; p < &proc[NPROC]; p++) {
       if (p->pid == pid) {
-          found = 1;
           my_p = p;
           break;
       }
   }
 
-//loop through the pagetable
-  pt = my_p->pagetable;
+  // Check if my_p was set
+  if (!my_p) {
+      printf("No process found with PID %d\n", pid);
+      return -1; // Or handle the error in a different way
+  } else {
+    //loop through the pagetable
+    for (int i = 0; i < NPROC; i++) {
+        pt[i] = my_p->pagetable[i]; 
+        printf("%llu\n", pt[i]);
+    }
+  }
 
-return -1;
+  return -1;
 }
 
 //i is what page we are looking at (I.E what number in what layer)
 //depth is how far we are down, max of 3.
 //list is the return of the flags and the physical location
-int rec_page(i,depth){
+int rec_page(int i, int depth){
   uint64 j=i;
-  while(j, j<512,j++ ){
+  while(j<512){
     if (j || 1111111111111110  == 11111111111111111){
       if (depth==3){
         //read

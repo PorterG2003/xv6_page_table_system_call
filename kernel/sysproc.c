@@ -131,25 +131,40 @@ sys_pages(void)
 //i is what page we are looking at (I.E what number in what layer)
 //depth is how far we are down, max of 3.
 //list is the return of the flags and the physical location
+
+
+//These are macros provided in riscv.h that we can use as a mask
+//#define PTE_V (1L << 0) // valid
+//#define PTE_R (1L << 1)
+//#define PTE_W (1L << 2)
+//#define PTE_X (1L << 3)
+//#define PTE_U (1L << 4) 
+
+
 int rec_page(int i, int depth){
   uint64 j=i;
   while(j<512){
-    if (j || 1111111111111110  == 11111111111111111){
+    //if (j || 1111111111111110  == 11111111111111111){
+    if(j & PTE_V){
       if (depth==3){
         //read
-         if (j || 1111111111111101  != 11111111111111111){
-          printf("!r");
+         //if (j || 1111111111111101  != 11111111111111111){
+         if(j & PTE_R){
+	   printf("!r");
          }
          //write
-         if (j || 1111111111111011  != 11111111111111111){
+         //if (j || 1111111111111011  != 11111111111111111){
+	 if(j & PTE_W){
           printf("!w");
          }
          //execute
-         if (j || 1111111111110111  != 11111111111111111){
+         //if (j || 1111111111110111  != 11111111111111111){
+	 if(j & PTE_X){
           printf("!x");
          }
          //user accesable
-         if (j || 1111111111101111  != 11111111111111111){
+         //if (j || 1111111111101111  != 11111111111111111){
+	 if(j & PTE_U){
           printf("!u");
          }
         return 0;
@@ -161,3 +176,4 @@ int rec_page(int i, int depth){
   }
   return 0;
 }
+

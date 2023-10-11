@@ -139,30 +139,33 @@ sys_pages(void)
 
 
 int rec_page(int i, int depth){
-  uint64 j=i;
-  while (j<512) {
-    if (j & PTE_V) {
+  uint64 entry=0;
+  for (entry = 0; entry < 512; entry++) {
+    if (entry & PTE_V) {
       if (depth==2) {
         //read
-        if (j & PTE_R) {
+        if (entry & PTE_R) {
           printf("!r");
         }
         //write
-        if (j & PTE_W) {
+        if (entry & PTE_W) {
           printf("!w");
         }
         //execute
-        if (j & PTE_X) {
+        if (entry & PTE_X) {
           printf("!x");
         }
         //user accesable
-        if (j & PTE_U) {
+        if (entry & PTE_U) {
           printf("!u");
         }
         return 0;
       }
-      printf("j");
-      rec_page(j,depth+1);
+      if (depth == 2)
+      {
+        return 0;
+      }
+      rec_page(entry,depth+1);
     }
   }
   return 0;

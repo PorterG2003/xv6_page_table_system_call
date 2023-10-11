@@ -142,20 +142,20 @@ int rec_page(int i, int depth){
   uint64 j=i;
   while (j<512) {
     if (j & PTE_V) {
-      if (depth==3) {
+      if (depth==2) {
         //read
         if (j & PTE_R) {
           printf("!r");
         }
-              //write
+        //write
         if (j & PTE_W) {
           printf("!w");
         }
-              //execute
+        //execute
         if (j & PTE_X) {
           printf("!x");
         }
-              //user accesable
+        //user accesable
         if (j & PTE_U) {
           printf("!u");
         }

@@ -104,7 +104,7 @@ sys_pages(void)
   struct proc *my_p = 0;
   struct proc proc[NPROC];
   struct proc *p;
-  uint64 pt[NPROC];
+  uint64 *pt;
 
   for( p = proc; p < &proc[NPROC]; p++) {
       if (p->pid == pid) {
@@ -119,12 +119,9 @@ sys_pages(void)
       return -1; // Or handle the error in a different way
   } else {
     //loop through the pagetable
-    for (int i = 0; i < NPROC; i++) {
-        pt[i] = my_p->pagetable[i]; 
-        printf("%llu\n", pt[i]);
-    }
+    pt = my_p->pagetable;
   }
-
+  pt = pt;
   return -1;
 }
 

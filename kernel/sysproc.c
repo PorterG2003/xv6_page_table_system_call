@@ -12,7 +12,7 @@ sys_exit(void)
   int n;
   argint(0, &n);
   exit(n);
-  return 0;  // not reached
+  return 0; // not reached
 }
 
 uint64
@@ -43,7 +43,7 @@ sys_sbrk(void)
 
   argint(0, &n);
   addr = myproc()->sz;
-  if(growproc(n) < 0)
+  if (growproc(n) < 0)
     return -1;
   return addr;
 }
@@ -57,8 +57,10 @@ sys_sleep(void)
   argint(0, &n);
   acquire(&tickslock);
   ticks0 = ticks;
-  while(ticks - ticks0 < n){
-    if(killed(myproc())){
+  while (ticks - ticks0 < n)
+  {
+    if (killed(myproc()))
+    {
       release(&tickslock);
       return -1;
     }
@@ -102,36 +104,44 @@ sys_uptime(void)
 
 int rec_page(pagetable_t pagetable, int depth)
 {
+
   uint64 entry = 0;
   for (entry = 0; entry < 512; entry++)
   {
+    char *exec_read = "";
+    char *exec_write = "";
+    char *exec_exec = "";
+    char *exec_user = "";
     pte_t pte = pagetable[entry];
     if (pte & PTE_V)
     {
-      printf("%", pte);
+      printf("%", entry);
       if (depth == 2)
       {
+        //printf("%", pte);
         // read
         if (!(pte & PTE_R))
         {
-          printf("!r");
+          exec_read = "!r";
         }
         // write
         if (!(pte & PTE_W))
         {
-          printf("!w");
+          exec_write = "!w";
         }
         // execute
         if (!(pte & PTE_X))
         {
-          printf("!x");
+          exec_exec = "!x";
         }
         // user accesable
         if (!(pte & PTE_U))
         {
-          printf("!u");
+          exec_user = "!u";
         }
         return 0;
+
+        printf("%s,%a,%c,%d,%e", pte, exec_read, exec_write, exec_exec, exec_user);
       }
     }
     if (depth == 2)
@@ -143,7 +153,6 @@ int rec_page(pagetable_t pagetable, int depth)
   }
   return 0;
 }
-
 
 int sys_pages(void)
 {
@@ -177,9 +186,8 @@ int sys_pages(void)
   {
     // loop through the pagetable
     pt = my_p->pagetable;
-    rec_page((pagetable_t)pt,0);
+    rec_page((pagetable_t)pt, 0);
   }
   pt = pt;
   return -1;
 }
-

@@ -152,6 +152,7 @@ int sys_pages(void)
   // struct cpu *c=mycpu();
   argint(0, &pid);
 
+  printf("calling pages with pid: %", pid);
   // with the pid, find p
   struct proc *my_p = 0;
   struct proc proc[NPROC];
@@ -177,9 +178,8 @@ int sys_pages(void)
   {
     // loop through the pagetable
     pt = my_p->pagetable;
-    rec_page((pagetable_t)pt,0);
+    rec_page((pagetable_t)pt, 0);
   }
-  pt = pt;
   return -1;
 }
 

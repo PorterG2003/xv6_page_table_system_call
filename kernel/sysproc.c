@@ -100,86 +100,13 @@ sys_uptime(void)
 // #define PTE_X (1L << 3)
 // #define PTE_U (1L << 4)
 
-int rec_page(pagetable_t pagetable, int depth)
-{
-  uint64 entry = 0;
-  for (entry = 0; entry < 512; entry++)
-  {
-    pte_t pte = pagetable[entry];
-    if (pte & PTE_V)
-    {
-      printf("%", pte);
-      if (depth == 2)
-      {
-        // read
-        if (!(pte & PTE_R))
-        {
-          printf("!r");
-        }
-        // write
-        if (!(pte & PTE_W))
-        {
-          printf("!w");
-        }
-        // execute
-        if (!(pte & PTE_X))
-        {
-          printf("!x");
-        }
-        // user accesable
-        if (!(pte & PTE_U))
-        {
-          printf("!u");
-        }
-        return 0;
-      }
-    }
-    if (depth == 2)
-    {
-      return 0;
-    }
-    uint64 child = PTE2PA(pte);
-    rec_page((pagetable_t)child, depth + 1);
-  }
-  return 0;
-}
+uint64
+sys_pages(void){
+  //printf("KERNAL: starting sys_pages\n");
 
-
-int sys_pages(void)
-{
-  // get the pid from arguments
   int pid;
-  // struct cpu *c=mycpu();
   argint(0, &pid);
 
-  printf("calling pages with pid: %", pid);
-  // with the pid, find p
-  struct proc *my_p = 0;
-  struct proc proc[NPROC];
-  struct proc *p;
-  uint64 *pt;
-
-  for (p = proc; p < &proc[NPROC]; p++)
-  {
-    if (p->pid == pid)
-    {
-      my_p = p;
-      break;
-    }
-  }
-
-  // Check if my_p was set
-  if (!my_p)
-  {
-    printf("No process found with PID %d\n", pid);
-    return -1; // Or handle the error in a different way
-  }
-  else
-  {
-    // loop through the pagetable
-    pt = my_p->pagetable;
-    rec_page((pagetable_t)pt, 0);
-  }
-  return -1;
+  return pages(pid);
 }
 

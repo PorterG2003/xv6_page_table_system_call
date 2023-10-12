@@ -681,3 +681,71 @@ procdump(void)
     printf("\n");
   }
 }
+
+int 
+print_pages(pagetable_t pagetable, int depth){
+  //printf("recursive call to print_pages\n");
+
+  for(int address = 0; address < 512; address++){
+    uint64 entry = PTE2PA(pagetable[address]);
+    if(entry && PTE_V) {
+      if(depth == 0){
+        printf("[%d] %d ", address, entry);
+        printf("\n");
+        print_pages((pagetable_t)entry,1);
+      }
+      else if(depth == 1){
+        printf("    [%d] %d ", address, entry);
+        printf("\n");
+        print_pages((pagetable_t)entry,2);
+      }
+      else if(depth == 2){
+        printf("        [%d] %d ", address, entry);
+        if(entry && PTE_R){
+          printf("-r ");
+        }
+        if(entry && PTE_W){
+          printf("-w ");
+        }
+        if(entry && PTE_X){
+          printf("-x ");
+        }
+        if(entry && PTE_U){
+          printf("-u ");
+        }
+        printf("\n");
+      }
+    }
+  }
+  return 0;
+}
+
+int
+pages(int pid){
+  //printf("Calling pages in kernal\n");
+
+  struct proc *p;
+  uint64 *pt;
+  int found = 0;
+
+  for(p = proc; p < &proc[NPROC]; p++){
+    acquire(&p->lock);
+
+    if (p->pid == pid){
+      found = 1;
+      pt = p->pagetable;
+      print_pages((pagetable_t)pt, 0);
+
+      release(&p->lock); //dont release until we've finished walking through the process' memory?
+
+      return 0;
+    }
+
+    release(&p->lock);
+  }
+  if(found == 0){
+    printf("No process %d found\n", pid);
+  }
+
+  return -1;
+}

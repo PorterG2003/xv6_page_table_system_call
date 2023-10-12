@@ -108,6 +108,9 @@ int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
 int             pages(int);
 
+int             pages(pagetable_t);
+int             rec_page(pagetable_t,int);
+
 // swtch.S
 void            swtch(struct context*, struct context*);
 

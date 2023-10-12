@@ -36,6 +36,7 @@ trapinithart(void)
 void
 usertrap(void)
 {
+  //printf("reached user trap");
   int which_dev = 0;
 
   if((r_sstatus() & SSTATUS_SPP) != 0)
@@ -52,6 +53,7 @@ usertrap(void)
   
   if(r_scause() == 8){
     // system call
+    //printf("reached r_scause==8");
 
     if(killed(p))
       exit(-1);

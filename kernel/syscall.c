@@ -127,7 +127,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-[SYS_pages]   sys_pages
+[SYS_pages]   sys_pages,
 };
 
 void
@@ -142,13 +142,9 @@ syscall(void)
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     // Use num to lookup the system call function for num, call it,
     // and store its return value in p->trapframe->a0
-    if(num==22){
-      printf("reached num 22\n");
-    }
+
     p->trapframe->a0 = syscalls[num]();
-    if(num==22){
-      printf("passes num 22\n");
-    }
+
   } else {
     printf("%d %s: unknown sys call %d\n",
             p->pid, p->name, num);

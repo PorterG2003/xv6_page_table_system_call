@@ -700,74 +700,71 @@ void procdump(void)
   }
 }
 
-// i is what page we are looking at (I.E what number in what layer)
-// depth is how far we are down, max of 3.
-// list is the return of the flags and the physical location
 
-// These are macros provided in riscv.h that we can use as a mask
-// #define PTE_V (1L << 0) // valid
-// #define PTE_R (1L << 1)
-// #define PTE_W (1L << 2)
-// #define PTE_X (1L << 3)
-// #define PTE_U (1L << 4)
+int 
+print_pages(pagetable_t pagetable, int depth){
+  //printf("recursive call to print_pages\n");
 
-int rec_page(pagetable_t pagetable, int depth)
-{
-  printf("starting rec_pages \n");
-  uint64 entry = 0;
-  for (entry = 0; entry < 512; entry++)
-  {
-    char *exec_read = "";
-    char *exec_write = "";
-    char *exec_exec = "";
-    char *exec_user = "";
-    pte_t pte = pagetable[entry];
-    if (pte & PTE_V)
-    {
-      printf("%d", entry);
-      if (depth == 2)
-      {
-        // printf("%", pte);
-        //  read
-        if (!(pte & PTE_R))
-        {
-          exec_read = "!r";
+  for(int address = 0; address < 512; address++){
+    uint64 entry = PTE2PA(pagetable[address]);
+    if(entry && PTE_V) {
+      if(depth == 0){
+        printf("[%d] %d ", address, entry);
+        printf("\n");
+        print_pages((pagetable_t)entry,1);
+      }
+      else if(depth == 1){
+        printf("    [%d] %d ", address, entry);
+        printf("\n");
+        print_pages((pagetable_t)entry,2);
+      }
+      else if(depth == 2){
+        printf("        [%d] %d ", address, entry);
+        if(entry && PTE_R){
+          printf("-r ");
         }
-        // write
-        if (!(pte & PTE_W))
-        {
-          exec_write = "!w";
+        if(entry && PTE_W){
+          printf("-w ");
         }
-        // execute
-        if (!(pte & PTE_X))
-        {
-          exec_exec = "!x";
+        if(entry && PTE_X){
+          printf("-x ");
         }
-        // user accesable
-        if (!(pte & PTE_U))
-        {
-          exec_user = "!u";
+        if(entry && PTE_U){
+          printf("-u ");
         }
-        printf("%d %s %s %s %s", pte, exec_read, exec_write, exec_exec, exec_user);
-        printf("ending rec_pages \n");
-        return 0;
+        printf("\n");
       }
     }
-    if (depth == 2)
-    {
-      printf("ending rec_pages \n");
-      return 0;
-    }
-    uint64 child = PTE2PA(pte);
-    rec_page((pagetable_t)child, depth + 1);
   }
-  printf("ending rec_pages \n");
   return 0;
 }
 
-int pages(pagetable_t pagetable)
-{
-  printf("starting pages \n");
-  return rec_page(pagetable, 0);
-  printf("ending pages \n");
+int
+pages(int pid){
+  //printf("Calling pages in kernal\n");
+
+  struct proc *p;
+  uint64 *pt;
+  int found = 0;
+
+  for(p = proc; p < &proc[NPROC]; p++){
+    acquire(&p->lock);
+
+    if (p->pid == pid){
+      found = 1;
+      pt = p->pagetable;
+      print_pages((pagetable_t)pt, 0);
+
+      release(&p->lock); //dont release until we've finished walking through the process' memory?
+
+      return 0;
+    }
+
+    release(&p->lock);
+  }
+  if(found == 0){
+    printf("No process %d found\n", pid);
+  }
+
+  return -1;
 }

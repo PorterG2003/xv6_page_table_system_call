@@ -91,45 +91,25 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+// i is what page we are looking at (I.E what number in what layer)
+// depth is how far we are down, max of 3.
+// list is the return of the flags and the physical location
 
-int 
-sys_pages(void)
-{
-  printf("starting sys_pages \n");
-  // get the pid from arguments
+// These are macros provided in riscv.h that we can use as a mask
+// #define PTE_V (1L << 0) // valid
+// #define PTE_R (1L << 1)
+// #define PTE_W (1L << 2)
+// #define PTE_X (1L << 3)
+// #define PTE_U (1L << 4)
+
+uint64
+sys_pages(void){
+  //printf("KERNAL: starting sys_pages\n");
+
   int pid;
-  // struct cpu *c=mycpu();
   argint(0, &pid);
   printf("starting sys_pages after getting argument \n");
 
-  // with the pid, find p
-  struct proc *p;
-  struct proc *my_p=0;
-  struct proc proc[NPROC];
-  
-  uint64 *pt;
 
-  for (p = proc; p < &proc[NPROC]; p++)
-  {
-    if (p->pid == pid)
-    {
-      my_p = p;
-      break;
-    }
-  }
-
-  // Check if my_p was set
-  if (!my_p)
-  {
-    printf("No process found with PID %d\n", pid);
-    return -1; // Or handle the error in a different way
-  }
-  else
-  {
-    // loop through the pagetable
-    pt = my_p->pagetable;
-    pages((pagetable_t)pt);
-  }
-  pt = pt;
-  return -1;
+  return pages(pid);
 }

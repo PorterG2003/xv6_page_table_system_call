@@ -91,80 +91,22 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
-// i is what page we are looking at (I.E what number in what layer)
-// depth is how far we are down, max of 3.
-// list is the return of the flags and the physical location
 
-// These are macros provided in riscv.h that we can use as a mask
-// #define PTE_V (1L << 0) // valid
-// #define PTE_R (1L << 1)
-// #define PTE_W (1L << 2)
-// #define PTE_X (1L << 3)
-// #define PTE_U (1L << 4)
-
-int rec_page(pagetable_t pagetable, int depth)
+int 
+sys_pages(void)
 {
-
-  uint64 entry = 0;
-  for (entry = 0; entry < 512; entry++)
-  {
-    char *exec_read = "";
-    char *exec_write = "";
-    char *exec_exec = "";
-    char *exec_user = "";
-    pte_t pte = pagetable[entry];
-    if (pte & PTE_V)
-    {
-      printf("%", entry);
-      if (depth == 2)
-      {
-        //printf("%", pte);
-        // read
-        if (!(pte & PTE_R))
-        {
-          exec_read = "!r";
-        }
-        // write
-        if (!(pte & PTE_W))
-        {
-          exec_write = "!w";
-        }
-        // execute
-        if (!(pte & PTE_X))
-        {
-          exec_exec = "!x";
-        }
-        // user accesable
-        if (!(pte & PTE_U))
-        {
-          exec_user = "!u";
-        }
-        return 0;
-
-        printf("%s,%a,%c,%d,%e", pte, exec_read, exec_write, exec_exec, exec_user);
-      }
-    }
-    if (depth == 2)
-    {
-      return 0;
-    }
-    uint64 child = PTE2PA(pte);
-    rec_page((pagetable_t)child, depth + 1);
-  }
-  return 0;
-}
-
-int sys_pages(void)
-{
+  printf("starting sys_pages \n");
   // get the pid from arguments
   int pid;
   // struct cpu *c=mycpu();
   argint(0, &pid);
+  printf("starting sys_pages after getting argument \n");
 
   // with the pid, find p
-  struct proc *my_p = 0;
-  struct proc proc[NPROC];
   struct proc *p;
+  struct proc *my_p=0;
+  struct proc proc[NPROC];
+  
   uint64 *pt;
 
   for (p = proc; p < &proc[NPROC]; p++)
@@ -186,7 +128,7 @@ int sys_pages(void)
   {
     // loop through the pagetable
     pt = my_p->pagetable;
-    rec_page((pagetable_t)pt, 0);
+    pages((pagetable_t)pt);
   }
   pt = pt;
   return -1;

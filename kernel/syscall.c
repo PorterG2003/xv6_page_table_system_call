@@ -61,7 +61,7 @@ argint(int n, int *ip)
 
 // Retrieve an argument as a pointer.
 // Doesn't check for legality, since
-// copyin/copyout will do that.
+// copyin/copyout will atoi that.
 void
 argaddr(int n, uint64 *ip)
 {
@@ -133,17 +133,26 @@ static uint64 (*syscalls[])(void) = {
 void
 syscall(void)
 {
+  //printf("reached syscall");
   int num;
   struct proc *p = myproc();
 
   num = p->trapframe->a7;
+  //printf("%d", NELEM(syscalls));
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     // Use num to lookup the system call function for num, call it,
     // and store its return value in p->trapframe->a0
+    if(num==22){
+      printf("reached num 22\n");
+    }
     p->trapframe->a0 = syscalls[num]();
+    if(num==22){
+      printf("passes num 22\n");
+    }
   } else {
     printf("%d %s: unknown sys call %d\n",
             p->pid, p->name, num);
     p->trapframe->a0 = -1;
   }
+  //printf("ended syscall");
 }

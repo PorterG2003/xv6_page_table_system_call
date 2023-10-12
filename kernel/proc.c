@@ -707,29 +707,29 @@ print_pages(pagetable_t pagetable, int depth){
 
   for(int address = 0; address < 512; address++){
     uint64 entry = PTE2PA(pagetable[address]);
-    if(entry && PTE_V) {
+    if(pagetable[address] && PTE_V) {
       if(depth == 0){
-        printf("[%d] %d ", address, entry);
+        printf("[%d] %d ", address, pagetable[address]);
         printf("\n");
         print_pages((pagetable_t)entry,1);
       }
       else if(depth == 1){
-        printf("    [%d] %d ", address, entry);
+        printf("    [%d] %d ", address, pagetable[address]);
         printf("\n");
         print_pages((pagetable_t)entry,2);
       }
       else if(depth == 2){
-        printf("        [%d] %d ", address, entry);
-        if(entry && PTE_R){
+        printf("        [%d] %d ", address, pagetable[address]);
+        if(pagetable[address] & PTE_R){
           printf("-r ");
         }
-        if(entry && PTE_W){
+        if(pagetable[address] & PTE_W){
           printf("-w ");
         }
-        if(entry && PTE_X){
+        if(pagetable[address] & PTE_X){
           printf("-x ");
         }
-        if(entry && PTE_U){
+        if(pagetable[address] & PTE_U){
           printf("-u ");
         }
         printf("\n");

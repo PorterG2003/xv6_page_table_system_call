@@ -717,6 +717,7 @@ int rec_page(pagetable_t pagetable, int depth)
   uint64 entry = 0;
   for (entry = 0; entry < 512; entry++)
   {
+    printf("going over entry %d \n",entry);
     char *exec_read = "";
     char *exec_write = "";
     char *exec_exec = "";
@@ -748,7 +749,7 @@ int rec_page(pagetable_t pagetable, int depth)
         {
           exec_user = "!u";
         }
-        printf("%d %s %s %s %s", pte, exec_read, exec_write, exec_exec, exec_user);
+        printf("%d %s %s %s %s \n", pte, exec_read, exec_write, exec_exec, exec_user);
         printf("ending rec_pages \n");
         return 0;
       }
